@@ -31,7 +31,7 @@ class Result
      */
     public function __construct(ResponseInterface $response)
     {
-        $result = \GuzzleHttp\json_decode($response->getBody(), true);
+        $result = json_decode($response->getBody(), true);
         $factory = new Factory();
 
         foreach ($result['messages'] as $messageAttributes) {
