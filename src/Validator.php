@@ -5,6 +5,7 @@ namespace Amneale\HtmlValidator;
 use Amneale\HtmlValidator\Exception\ResponseException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Message\ResponseInterface;
 
 class Validator
 {

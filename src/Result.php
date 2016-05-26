@@ -2,6 +2,7 @@
 
 namespace Amneale\HtmlValidator;
 
+use Amneale\HtmlValidator\Exception\ResponseException;
 use Amneale\HtmlValidator\Message\AbstractMessage;
 use Amneale\HtmlValidator\Message\Error;
 use Amneale\HtmlValidator\Message\Factory;
@@ -32,6 +33,12 @@ class Result
     public function __construct(ResponseInterface $response)
     {
         $result = json_decode($response->getBody(), true);
+
+        if (!isset($result['messages'])) {
+            // TODO do we get messages if validation passes?
+            throw new ResponseException('Response contains no messages');
+        }
+
         $factory = new Factory();
 
         foreach ($result['messages'] as $messageAttributes) {
