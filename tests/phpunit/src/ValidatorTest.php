@@ -80,7 +80,7 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Amneale\HtmlValidator\Exception\ResponseException
+     * @expectedException \Amneale\HtmlValidator\Exception\ResponseException
      * @expectedExceptionMessage Server did not respond with the expected content-type (application/json)
      */
     public function testValidateUrlWithInvalidContentType()

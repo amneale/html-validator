@@ -17,7 +17,7 @@ class ResultTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Amneale\HtmlValidator\Exception\ResponseException
+     * @expectedException \Amneale\HtmlValidator\Exception\ResponseException
      * @expectedExceptionMessage Response contains no messages
      */
     public function testConstructionWithNoMessages()
