@@ -71,7 +71,8 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
 
         $client
             ->expects($this->once())
-            ->method('get')
+            ->method('__call')
+            ->with($this->equalTo('get'))
             ->willReturn(new Response(500));
 
         $this->validator->setClient($client);
@@ -90,7 +91,8 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
 
         $client
             ->expects($this->once())
-            ->method('get')
+            ->method('__call')
+            ->with($this->equalTo('get'))
             ->willReturn(new Response(
                 200,
                 ['Content-Type' => 'invalid/type']
@@ -117,7 +119,8 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
 
         $client
             ->expects($this->once())
-            ->method('get')
+            ->method('__call')
+            ->with($this->equalTo('get'))
             ->willReturn(new Response(
                 200,
                 ['Content-Type' => 'application/json'],

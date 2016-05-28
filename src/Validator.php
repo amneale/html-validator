@@ -4,8 +4,6 @@ namespace Amneale\HtmlValidator;
 
 use Amneale\HtmlValidator\Exception\ResponseException;
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Message\ResponseInterface;
 
 class Validator
 {
@@ -43,9 +41,9 @@ class Validator
     }
 
     /**
-     * @param ClientInterface $client
+     * @param Client $client
      */
-    public function setClient($client)
+    public function setClient(Client $client)
     {
         $this->client = $client;
     }
