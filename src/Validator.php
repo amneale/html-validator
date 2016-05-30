@@ -2,8 +2,9 @@
 
 namespace Amneale\HtmlValidator;
 
-use Amneale\HtmlValidator\Exception\ResponseException;
 use GuzzleHttp\Client;
+use RuntimeException;
+use function GuzzleHttp\json_decode;
 
 class Validator
 {
@@ -66,8 +67,8 @@ class Validator
 
     /**
      * @param $url
-     * @return Result
-     * @throws ResponseException
+     * @return Message[]
+     * @throws RuntimeException
      */
     public function validateUrl($url)
     {
@@ -83,13 +84,24 @@ class Validator
         );
 
         if ($response->getStatusCode() !== 200) {
-            throw new ResponseException('Server responded with HTTP status ' . $response->getStatusCode());
+            throw new RuntimeException('Server responded with HTTP status ' . $response->getStatusCode());
         }
 
         if (strpos($response->getHeaderLine('Content-Type'), 'application/json') === false) {
-            throw new ResponseException('Server did not respond with the expected content-type (application/json)');
+            throw new RuntimeException('Server did not respond with the expected content-type (application/json)');
         }
 
-        return new Result($response);
+        $messages = [];
+        $result = json_decode($response->getBody(), true);
+
+        if (!isset($result['messages'])) {
+            return $messages;
+        }
+
+        foreach ($result['messages'] as $messageAttributes) {
+            $messages[] = new Message($messageAttributes);
+        }
+
+        return $messages;
     }
 }

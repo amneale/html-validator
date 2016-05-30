@@ -2,11 +2,11 @@
 
 namespace Amneale\HtmlValidator\Tests\Validator;
 
-use Amneale\HtmlValidator\Result;
 use Amneale\HtmlValidator\Validator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
+use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 
 class ValidatorTest extends PHPUnit_Framework_TestCase
@@ -60,30 +60,50 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Amneale\HtmlValidator\Exception\ResponseException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Server responded with HTTP status 500
      */
     public function testValidateUrlWithInvalidStatusCode()
     {
-        $client = $this->getMockBuilder(Client::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client
-            ->expects($this->once())
-            ->method('__call')
-            ->with($this->equalTo('get'))
-            ->willReturn(new Response(500));
-
-        $this->validator->setClient($client);
+        $this->validator->setClient($this->getClient(new Response(500)));
         $this->validator->validateUrl(self::TEST_URL);
     }
 
     /**
-     * @expectedException \Amneale\HtmlValidator\Exception\ResponseException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Server did not respond with the expected content-type (application/json)
      */
     public function testValidateUrlWithInvalidContentType()
+    {
+        $this->validator->setClient($this->getClient(new Response(200, ['Content-Type' => 'invalid/type'])));
+        $this->validator->validateUrl(self::TEST_URL);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage json_decode error: unexpected character
+     */
+    public function testValidateUrlWithInvalidJson()
+    {
+        $this->validator->setClient($this->getClient($this->getJsonResponse('invalidJson')));
+        $messages = $this->validator->validateUrl(self::TEST_URL);
+
+        $this->assertInternalType('array', $messages);
+    }
+
+    public function testValidateUrl()
+    {
+        $this->validator->setClient($this->getClient($this->getJsonResponse('{"messages": []}')));
+        $messages = $this->validator->validateUrl(self::TEST_URL);
+
+        $this->assertInternalType('array', $messages);
+    }
+
+    /**
+     * @param Response $response
+     * @return Client|PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getClient(Response $response)
     {
         $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
@@ -93,16 +113,16 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('__call')
             ->with($this->equalTo('get'))
-            ->willReturn(new Response(
-                200,
-                ['Content-Type' => 'invalid/type']
-            ));
+            ->willReturn($response);
 
-        $this->validator->setClient($client);
-        $this->validator->validateUrl(self::TEST_URL);
+        return $client;
     }
 
-    public function testValidateUrl()
+    /**
+     * @param string $json
+     * @return Response
+     */
+    private function getJsonResponse($json)
     {
         $body = $this->getMockBuilder(Stream::class)
             ->disableOriginalConstructor()
@@ -111,25 +131,8 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
         $body
             ->expects($this->once())
             ->method('__toString')
-            ->willReturn('{"messages": []}');
+            ->willReturn($json);
 
-        $client = $this->getMockBuilder(Client::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client
-            ->expects($this->once())
-            ->method('__call')
-            ->with($this->equalTo('get'))
-            ->willReturn(new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                $body
-            ));
-
-        $this->validator->setClient($client);
-        $result = $this->validator->validateUrl(self::TEST_URL);
-
-        $this->assertInstanceOf(Result::class, $result);
+        return new Response(200,  ['Content-Type' => 'application/json'], $body);
     }
 }

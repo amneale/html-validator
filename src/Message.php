@@ -1,8 +1,10 @@
 <?php
 
-namespace Amneale\HtmlValidator\Message;
+namespace Amneale\HtmlValidator;
 
-abstract class AbstractMessage
+use InvalidArgumentException;
+
+class Message
 {
     /**
      * @var string
@@ -54,28 +56,38 @@ abstract class AbstractMessage
      */
     protected $hiliteEnd;
 
-    public function __construct(
-        $type,
-        $firstLine,
-        $lastLine,
-        $firstColumn,
-        $lastColumn,
-        $message,
-        $extract,
-        $hiliteStart,
-        $hiliteEnd,
-        $subType
-    ) {
-        $this->type = $type;
-        $this->firstLine = $firstLine;
-        $this->lastLine = $lastLine;
-        $this->firstColumn = $firstColumn;
-        $this->lastColumn = $lastColumn;
-        $this->message = $message;
-        $this->extract = $extract;
-        $this->hiliteStart = $hiliteStart;
-        $this->hiliteEnd = $hiliteEnd;
-        $this->subType = $subType;
+    /**
+     * @var array
+     */
+    protected $defaults = [
+        'lastLine'     => 0,
+        'firstColumn'  => 0,
+        'lastColumn'   => 0,
+        'hiliteStart'  => 0,
+        'hiliteLength' => 0,
+        'message'      => '',
+        'extract'      => '',
+        'subType'      => null,
+    ];
+
+    public function __construct(array $attributes)
+    {
+        $attributes = array_merge($this->defaults, $attributes);
+
+        if (!isset($attributes['type'])) {
+            throw new InvalidArgumentException('Invalid message: message type not specified.');
+        }
+
+        $this->type =  $attributes['type'];
+        $this->firstLine = isset($attributes['firstLine']) ? $attributes['firstLine'] : $attributes['lastLine'];
+        $this->lastLine = $attributes['lastLine'];
+        $this->firstColumn = $attributes['firstColumn'];
+        $this->lastColumn = $attributes['lastColumn'];
+        $this->message = $attributes['message'];
+        $this->extract = $attributes['extract'];
+        $this->hiliteStart = $attributes['hiliteStart'];
+        $this->hiliteEnd = $attributes['hiliteLength'];
+        $this->subType = $attributes['subType'];
     }
 
     /**
@@ -156,13 +168,5 @@ abstract class AbstractMessage
     public function getHiliteEnd()
     {
         return $this->hiliteEnd;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getMessage();
     }
 }
