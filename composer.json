@@ -2,6 +2,7 @@
     "name": "amneale/html-validator",
     "description": "Validate website HTML using validator.nu",
     "require": {
+        "php": ">=5.6.0",
         "guzzlehttp/guzzle": "~6.2"
     },
     "require-dev": {
