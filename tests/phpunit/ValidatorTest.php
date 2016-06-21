@@ -1,5 +1,4 @@
 <?php
-
 namespace Amneale\HtmlValidator\Tests\Validator;
 
 use Amneale\HtmlValidator\Validator;
@@ -93,10 +92,20 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
 
     public function testValidateUrl()
     {
-        $this->validator->setClient($this->getClient($this->getJsonResponse('{"messages": []}')));
+        $messages = [
+            [
+                'type' => 'info',
+                'message' => 'test message',
+            ]
+        ];
+
+        $this->validator->setClient($this->getClient(
+            $this->getJsonResponse('{"messages": ' . json_encode($messages) . '}')
+        ));
         $messages = $this->validator->validateUrl(self::TEST_URL);
 
         $this->assertInternalType('array', $messages);
+        $this->assertCount(1, $messages);
     }
 
     /**

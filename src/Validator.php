@@ -1,5 +1,4 @@
 <?php
-
 namespace Amneale\HtmlValidator;
 
 use GuzzleHttp\Client;
@@ -27,6 +26,10 @@ class Validator
      */
     private $parser;
 
+    /**
+     * @param string $validatorUrl
+     * @param string $parser
+     */
     public function __construct($validatorUrl = self::DEFAULT_URL, $parser = self::PARSER_HTML)
     {
         $this->setClient(new Client(['base_uri' => $validatorUrl]));

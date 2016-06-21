@@ -1,5 +1,4 @@
 <?php
-
 namespace Amneale\HtmlValidator\Tests\Validator;
 
 use Amneale\HtmlValidator\Message;

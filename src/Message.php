@@ -1,5 +1,4 @@
 <?php
-
 namespace Amneale\HtmlValidator;
 
 use InvalidArgumentException;
@@ -70,6 +69,9 @@ class Message
         'subType'      => null,
     ];
 
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes)
     {
         $attributes = array_merge($this->defaults, $attributes);
